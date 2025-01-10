@@ -1,26 +1,20 @@
-variable "username" {
-    type = list(string)
-    default = [ "Ajeeth", "Mani", "Darshan" ] 
-}
-
 resource "aws_iam_user" "userlist" {
-    count = length(var.username)
-    name  = element(var.username, count.index)
+  count = length(var.username)
+  name  = element(var.username, count.index)
 }
 
 resource "aws_iam_group" "sre_group" {
-    name = "SiteReliability"
+  name = var.sre_group_name
 }
 
 resource "aws_iam_user_group_membership" "user_group_membership" {
-    count  = length(var.username)
-    user   = element(var.username, count.index)
-    groups = [aws_iam_group.sre_group.name, ]
+  count  = length(var.username)
+  user   = element(var.username, count.index)
+  groups = [aws_iam_group.sre_group.name, ]
 }
 
 resource "aws_iam_policy" "policy" {
-  name        = "sre-policy"
-  description = "My test policy"
+  name = var.policy_name
 
   # Terraform's "jsonencode" function converts a
   # Terraform expression result to valid JSON syntax.
@@ -40,7 +34,7 @@ resource "aws_iam_policy" "policy" {
 }
 
 resource "aws_iam_policy_attachment" "test-attach" {
-  name       = "test-attachment"
+  name       = var.test-attach-name
   groups     = [aws_iam_group.sre_group.name]
   policy_arn = aws_iam_policy.policy.arn
 }
